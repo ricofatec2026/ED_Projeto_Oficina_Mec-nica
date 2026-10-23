@@ -18,9 +18,11 @@ oficina_mecanica/
 │   ├── pilha.py         # Pilha (LIFO) própria
 │   └── arvore.py        # Árvore N-ária própria
 ├── modelos/            # Regras de negócio da oficina (usam as estruturas acima)
-│   └── atendimento.py   # Controle de atendimento (fila guincho + fila normal)
+│   ├── atendimento.py   # Controle de atendimento (fila guincho + fila normal)
+│   └── cliente.py       # Controle de clientes e veículos (lista + lista)
 ├── testes/
-│   └── teste_estruturas.py
+│   ├── teste_estruturas.py
+│   └── teste_clientes.py
 └── README.md
 ```
 
@@ -28,7 +30,7 @@ oficina_mecanica/
 
 - [x] Estruturas genéricas: Lista, Fila, Pilha, Árvore N-ária
 - [x] Controle de Atendimento (fila guincho + fila normal)
-- [ ] Controle de Clientes e Veículos (Lista de clientes, cada um com Lista de veículos)
+- [x] Controle de Clientes e Veículos (Lista de clientes, cada um com Lista de veículos)
 - [ ] Árvore de Componentes pré-definida (diagnóstico)
 - [ ] Controle de Estoque (Lista de produtos, cada um com Fila de lotes)
 - [ ] Ordem de Serviço
@@ -55,8 +57,19 @@ lotes. A baixa de estoque percorre a lista até achar o produto e
 consome a fila do lote mais antigo (FIFO).
 
 ### 3. Clientes e seus veículos — Lista + Lista
-*(a implementar)* Lista de clientes, cada cliente contendo uma Lista de
-veículos. Busca por placa percorre as duas listas.
+**Classes envolvidas:** `ControleClientes` (modelos/cliente.py), que
+mantém uma `Lista` (estruturas/lista.py) de `Cliente`; cada `Cliente`
+mantém sua própria `Lista` de `Veiculo`.
+**Método:** `ControleClientes.buscar_veiculo_por_placa(placa)` —
+percorre a lista de clientes e, para cada um, percorre sua lista de
+veículos até encontrar a placa.
+**Justificativa:** cada cliente é dono natural de seus veículos, então
+aninhar uma lista dentro da outra reflete o domínio do problema e
+permite que cada cliente cresça sua lista de veículos de forma
+independente, sem limite pré-definido. Usar uma única lista global de
+veículos exigiria guardar uma referência/chave ao cliente em cada
+veículo e perderia a relação direta de posse; a remoção de um cliente
+também não removeria automaticamente seus veículos.
 
 ## Cronograma de desenvolvimento (commits diários)
 
