@@ -19,10 +19,12 @@ oficina_mecanica/
 │   └── arvore.py        # Árvore N-ária própria
 ├── modelos/            # Regras de negócio da oficina (usam as estruturas acima)
 │   ├── atendimento.py   # Controle de atendimento (fila guincho + fila normal)
-│   └── cliente.py       # Controle de clientes e veículos (lista + lista)
+│   ├── cliente.py       # Controle de clientes e veículos (lista + lista)
+│   └── diagnostico.py   # Diagnóstico via árvore de componentes pré-definida
 ├── testes/
 │   ├── teste_estruturas.py
-│   └── teste_clientes.py
+│   ├── teste_clientes.py
+│   └── teste_diagnostico.py
 └── README.md
 ```
 
@@ -31,7 +33,7 @@ oficina_mecanica/
 - [x] Estruturas genéricas: Lista, Fila, Pilha, Árvore N-ária
 - [x] Controle de Atendimento (fila guincho + fila normal)
 - [x] Controle de Clientes e Veículos (Lista de clientes, cada um com Lista de veículos)
-- [ ] Árvore de Componentes pré-definida (diagnóstico)
+- [x] Árvore de Componentes pré-definida (diagnóstico)
 - [ ] Controle de Estoque (Lista de produtos, cada um com Fila de lotes)
 - [ ] Ordem de Serviço
 - [ ] Controle de Pagamento
