@@ -20,11 +20,15 @@ oficina_mecanica/
 ├── modelos/            # Regras de negócio da oficina (usam as estruturas acima)
 │   ├── atendimento.py   # Controle de atendimento (fila guincho + fila normal)
 │   ├── cliente.py       # Controle de clientes e veículos (lista + lista)
-│   └── diagnostico.py   # Diagnóstico via árvore de componentes pré-definida
+│   ├── diagnostico.py   # Diagnóstico via árvore de componentes pré-definida
+│   ├── estoque.py       # Controle de estoque (lista de produtos + fila de lotes)
+│   └── ordem_servico.py # Ordem de Serviço (peças, serviços, fechamento)
 ├── testes/
 │   ├── teste_estruturas.py
 │   ├── teste_clientes.py
-│   └── teste_diagnostico.py
+│   ├── teste_diagnostico.py
+│   ├── teste_estoque.py
+│   └── teste_ordem_servico.py
 └── README.md
 ```
 
@@ -34,8 +38,8 @@ oficina_mecanica/
 - [x] Controle de Atendimento (fila guincho + fila normal)
 - [x] Controle de Clientes e Veículos (Lista de clientes, cada um com Lista de veículos)
 - [x] Árvore de Componentes pré-definida (diagnóstico)
-- [ ] Controle de Estoque (Lista de produtos, cada um com Fila de lotes)
-- [ ] Ordem de Serviço
+- [x] Controle de Estoque (Lista de produtos, cada um com Fila de lotes)
+- [x] Ordem de Serviço
 - [ ] Controle de Pagamento
 - [ ] Simulação de atendimento completo (fluxo integrado ponta a ponta)
 
@@ -54,9 +58,18 @@ vez que um guincho chegasse, o que é O(n) e quebra a ordem de chegada
 dos demais veículos.
 
 ### 2. Estoque com vários lotes por produto — Lista + Fila
-*(a implementar)* Lista de produtos, cada produto contendo uma Fila de
-lotes. A baixa de estoque percorre a lista até achar o produto e
-consome a fila do lote mais antigo (FIFO).
+**Classes envolvidas:** `ControleEstoque` (modelos/estoque.py), que
+mantém uma `Lista` de `Produto`; cada `Produto` mantém sua própria
+`Fila` de `Lote`.
+**Método:** `ControleEstoque.baixar_estoque(codigo, quantidade)` →
+`Produto.baixar_estoque(...)` — percorre a lista até achar o produto e
+consome a fila de lotes a partir da frente (lote mais antigo), passando
+para o próximo lote quando o atual não é suficiente.
+**Justificativa:** a Fila garante FIFO nativamente, sem precisar
+ordenar os lotes por data a cada baixa — o lote mais antigo já está
+sempre na frente. Usar uma única lista de lotes misturada exigiria
+ordenação a cada operação ou controle manual de "qual é o mais antigo",
+o que é mais custoso e propenso a erro.
 
 ### 3. Clientes e seus veículos — Lista + Lista
 **Classes envolvidas:** `ControleClientes` (modelos/cliente.py), que
@@ -80,10 +93,10 @@ também não removeria automaticamente seus veículos.
 | 1 | 22/10 (qui) | Estruturas genéricas (Lista, Fila, Pilha, Árvore) + Controle de Atendimento |
 | 2 | 23/10 (sex) | Controle de Clientes e Veículos (Lista + Lista) |
 | 3 | 24/10 (sáb) | Árvore de Componentes pré-definida + exibição indentada |
-| 4 | 25/10 (dom) | Controle de Estoque (Lista + Fila de lotes) + alerta de mínimo |
-| 5 | 26/10 (seg) | Ordem de Serviço (criação, adicionar/remover peças e serviços) |
-| 6 | 27/10 (ter) | Controle de Pagamento + baixa de estoque no fechamento da OS |
-| 7 | 28/10 (qua) | Simulação completa ponta a ponta + revisão geral + ajustes no README |
+| — | 25/10 (dom) | *(sem produção)* |
+| 4 | 26/10 (seg) | Controle de Estoque (Lista + Fila de lotes) + Ordem de Serviço |
+| 5 | 27/10 (ter) | Controle de Pagamento + baixa de estoque no fechamento da OS + simulação completa ponta a ponta |
+| — | 28/10 (qua) | Treino da apresentação (sem código novo) |
 | — | 29/10 (qui) | Apresentação (10 min) |
 
 ## Observações sobre a implementação
