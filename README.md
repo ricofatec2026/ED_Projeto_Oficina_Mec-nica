@@ -12,27 +12,31 @@ dados do problema; estruturas implementadas do zero).
 
 ```
 oficina_mecanica/
-├── estruturas/        # Estruturas de dados genéricas (sem regra de negócio)
-│   ├── lista.py        # Lista encadeada própria
-│   ├── fila.py          # Fila (FIFO) própria
-│   ├── pilha.py         # Pilha (LIFO) própria
-│   └── arvore.py        # Árvore N-ária própria
-├── modelos/            # Regras de negócio da oficina (usam as estruturas acima)
-│   ├── atendimento.py   # Controle de atendimento (fila guincho + fila normal)
-│   ├── cliente.py       # Controle de clientes e veículos (lista + lista)
-│   ├── diagnostico.py   # Diagnóstico via árvore de componentes pré-definida
-│   ├── estoque.py       # Controle de estoque (lista de produtos + fila de lotes)
-│   └── ordem_servico.py # Ordem de Serviço (peças, serviços, fechamento)
+├── estruturas/           # Estruturas de dados genéricas (sem regra de negócio)
+│   ├── lista.py            # Lista encadeada própria
+│   ├── fila.py             # Fila (FIFO) própria
+│   ├── pilha.py            # Pilha (LIFO) própria
+│   └── arvore.py           # Árvore N-ária própria
+├── modelos/               # Regras de negócio da oficina (usam as estruturas acima)
+│   ├── atendimento.py       # Controle de atendimento (fila guincho + fila normal)
+│   ├── cliente.py           # Controle de clientes e veículos (lista + lista)
+│   ├── diagnostico.py       # Diagnóstico via árvore de componentes pré-definida
+│   ├── estoque.py           # Controle de estoque (lista de produtos + fila de lotes)
+│   ├── ordem_servico.py     # Ordem de Serviço (peças, serviços, fechamento)
+│   ├── pagamento.py         # Controle de Pagamento
+│   └── fechamento.py        # Integra OS + estoque + pagamento + rastreabilidade
 ├── testes/
 │   ├── teste_estruturas.py
 │   ├── teste_clientes.py
 │   ├── teste_diagnostico.py
 │   ├── teste_estoque.py
-│   └── teste_ordem_servico.py
+│   ├── teste_ordem_servico.py
+│   └── teste_pagamento.py
+├── simulacao.py           # Simulação de atendimento completo ponta a ponta
 └── README.md
 ```
 
-## Status atual (em desenvolvimento)
+## Status atual — projeto concluído
 
 - [x] Estruturas genéricas: Lista, Fila, Pilha, Árvore N-ária
 - [x] Controle de Atendimento (fila guincho + fila normal)
@@ -40,8 +44,10 @@ oficina_mecanica/
 - [x] Árvore de Componentes pré-definida (diagnóstico)
 - [x] Controle de Estoque (Lista de produtos, cada um com Fila de lotes)
 - [x] Ordem de Serviço
-- [ ] Controle de Pagamento
-- [ ] Simulação de atendimento completo (fluxo integrado ponta a ponta)
+- [x] Controle de Pagamento
+- [x] Simulação de atendimento completo (fluxo integrado ponta a ponta)
+
+Rodar a simulação completa: `python -m simulacao` (a partir da raiz do projeto).
 
 ## Combinações de estruturas (obrigatório pelo enunciado)
 
@@ -86,25 +92,40 @@ veículos exigiria guardar uma referência/chave ao cliente em cada
 veículo e perderia a relação direta de posse; a remoção de um cliente
 também não removeria automaticamente seus veículos.
 
-## Cronograma de desenvolvimento (commits diários)
+## Fluxo integrado (simulacao.py)
 
-| Dia | Data | Entrega |
-|---|---|---|
-| 1 | 22/10 (qui) | Estruturas genéricas (Lista, Fila, Pilha, Árvore) + Controle de Atendimento |
-| 2 | 23/10 (sex) | Controle de Clientes e Veículos (Lista + Lista) |
-| 3 | 24/10 (sáb) | Árvore de Componentes pré-definida + exibição indentada |
-| — | 25/10 (dom) | *(sem produção)* |
-| 4 | 26/10 (seg) | Controle de Estoque (Lista + Fila de lotes) + Ordem de Serviço |
-| 5 | 27/10 (ter) | Controle de Pagamento + baixa de estoque no fechamento da OS + simulação completa ponta a ponta |
-| — | 28/10 (qua) | Treino da apresentação (sem código novo) |
-| — | 29/10 (qui) | Apresentação (10 min) |
+O arquivo `simulacao.py` reproduz o fluxo completo pedido no
+enunciado, chamando os módulos de todos os dias em sequência:
+
+1. **Chegada do veículo** → `ControleAtendimento.chegar_veiculo()`
+2. **Box livre, chama o próximo e abre a OS** →
+   `ControleAtendimento.proximo_veiculo()` + `ControleOrdensServico.abrir_os()`
+3. **Diagnóstico na árvore de componentes** →
+   `ControleDiagnostico.marcar_defeito()` + `exibir_diagnostico()`
+4. **Inclusão de peças/serviços na OS** →
+   `OrdemServico.adicionar_peca()` / `adicionar_servico()`
+5. **Fechamento da OS e pagamento** →
+   `ControleFechamento.fechar_os_com_pagamento()`, que orquestra, nesta
+   ordem: baixa de estoque pelo lote mais antigo (`ControleEstoque`),
+   fechamento da OS (valida remontagem concluída), registro do
+   pagamento (`ControleFinanceiro`) e registro de rastreabilidade do
+   consumo (`RegistroConsumo`, em `modelos/fechamento.py`).
+
+`ControleFechamento` não cria uma nova estrutura de dados — ele integra
+as já existentes (Estoque, OS, Pagamento), mantendo a separação de
+responsabilidades: cada módulo cuida da sua parte, e o fechamento cuida
+apenas da orquestração entre eles.
 
 ## Observações sobre a implementação
 
 - Nenhuma estrutura built-in do Python (`list`, `dict`, `queue.Queue`,
   etc.) é usada para resolver as estruturas de dados do problema. Elas
-  podem aparecer apenas internamente, encapsuladas (ex.: não se aplica
-  no momento — tudo via nós encadeados próprios).
+  são implementadas do zero com nós encadeados próprios, em
+  `estruturas/`.
 - Separação de responsabilidades: `estruturas/` contém apenas
   estruturas de dados puras e reutilizáveis; `modelos/` contém as
   regras específicas da oficina, que usam as estruturas de `estruturas/`.
+- Todos os módulos têm testes manuais em `testes/`, cobrindo o caminho
+  feliz e casos de borda (dados duplicados, estoque insuficiente,
+  fechamento antes da remontagem concluída, forma de pagamento
+  inválida, etc.).
