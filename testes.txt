@@ -1,0 +1,11 @@
+python -m testes.teste_estruturas
+
+python -m testes.teste_clientes
+
+python -m testes.teste_diagnostico
+
+python -m testes.teste_estoque
+
+python -m testes.teste_ordem_servico
+
+python -m testes.teste_pagamento
